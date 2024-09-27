@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 type Props = {
   fn: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   setAlias: React.Dispatch<React.SetStateAction<string>>;
