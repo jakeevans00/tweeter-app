@@ -17,25 +17,24 @@ export class LoginPresenter extends AuthPresenter {
     if (this.checkSubmitButtonStatus(alias, password)) {
       return;
     }
+    super.tryOperation(
+      async () => {
+        this.view.setIsLoading(true);
+        const [user, authToken] = await this.userService.login(alias, password);
 
-    try {
-      this.view.setIsLoading(true);
-      const [user, authToken] = await this.userService.login(alias, password);
+        this.view.updateUserInfo(user, user, authToken, rememberMe);
 
-      this.view.updateUserInfo(user, user, authToken, rememberMe);
-
-      if (originalUrl) {
-        this.view.navigate(originalUrl);
-      } else {
-        this.view.navigate("/");
+        if (originalUrl) {
+          this.view.navigate(originalUrl);
+        } else {
+          this.view.navigate("/");
+        }
+      },
+      "log user",
+      () => {
+        this.view.setIsLoading(false);
       }
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`
-      );
-    } finally {
-      this.view.setIsLoading(false);
-    }
+    );
   }
 
   public checkSubmitButtonStatus = (

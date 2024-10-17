@@ -1,20 +1,17 @@
 import { AuthToken, Status, User } from "tweeter-shared";
 import { StatusService } from "../model/service/StatusService";
+import { MessageView, Presenter } from "./Presenter";
 
-export interface PostStatusView {
+export interface PostStatusView extends MessageView {
   setPost: (post: string) => void;
-  displayInfoMessage: (message: string, duration: number) => void;
-  displayErrorMessage: (message: string) => void;
-  clearLastInfoMessage: () => void;
 }
 
-export class PostStatusPresenter {
-  private view;
+export class PostStatusPresenter extends Presenter<PostStatusView> {
   private statusService = new StatusService();
   private _isLoading = false;
 
   constructor(view: PostStatusView) {
-    this.view = view;
+    super(view);
   }
 
   public get isLoading() {
@@ -26,34 +23,30 @@ export class PostStatusPresenter {
     currentUser: User,
     authToken: AuthToken
   ) {
-    try {
-      this._isLoading = true;
-      this.view.displayInfoMessage("Posting status...", 0);
+    super.tryOperation(
+      async () => {
+        this._isLoading = true;
+        this.view.displayInfoMessage("Posting status...", 0);
 
-      const status = new Status(post, currentUser!, Date.now());
+        const status = new Status(post, currentUser!, Date.now());
 
-      await this.statusService.postStatus(authToken!, status);
+        await this.statusService.postStatus(authToken!, status);
 
-      this.view.setPost("");
-      this.view.displayInfoMessage("Status posted!", 2000);
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to post the status because of exception: ${error}`
-      );
-    } finally {
-      this.view.clearLastInfoMessage();
-      this._isLoading = false;
-    }
+        this.view.setPost("");
+        this.view.displayInfoMessage("Status posted!", 2000);
+      },
+      "post the status",
+      () => {
+        this.view.clearLastInfoMessage();
+        this._isLoading = false;
+      }
+    );
   }
 
   public async clearPost() {
-    try {
+    super.tryOperation(async () => {
       this.view.setPost("");
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to clear status because of exception ${error}`
-      );
-    }
+    }, "clear status");
   }
 
   public checkButtonStatus(
