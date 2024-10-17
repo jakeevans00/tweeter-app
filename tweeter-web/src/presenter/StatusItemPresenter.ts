@@ -1,9 +1,8 @@
 import { Status } from "tweeter-shared";
-import { View } from "./Presenter";
-import { PagedItemPresenter } from "./PagedItemPresenter";
+import { PagedItemPresenter, PagedItemView } from "./PagedItemPresenter";
 import { StatusService } from "../model/service/StatusService";
 
-export interface StatusItemView extends View {
+export interface StatusItemView extends PagedItemView<Status> {
   addItems: (newItems: Status[]) => void;
 }
 

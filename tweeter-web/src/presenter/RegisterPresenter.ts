@@ -1,4 +1,3 @@
-import { UserService } from "../model/service/UserService";
 import { AuthPresenter, AuthView } from "./AuthPresenter";
 import { Buffer } from "buffer";
 
@@ -6,10 +5,16 @@ export interface RegisterView extends AuthView {
   setImageUrl: (url: string) => void;
 }
 export class RegisterPresenter extends AuthPresenter {
-  private userService = new UserService();
+  protected getAuthDescription(): string {
+    return "register user";
+  }
 
-  constructor(private registerView: RegisterView) {
+  constructor(registerView: RegisterView) {
     super(registerView);
+  }
+
+  protected get view() {
+    return super.view as RegisterView;
   }
 
   public async doRegister(
@@ -33,27 +38,17 @@ export class RegisterPresenter extends AuthPresenter {
     ) {
       return;
     }
-    super.tryOperation(
-      async () => {
-        this.view.setIsLoading(true);
-
-        const [user, authToken] = await this.userService.register(
-          firstName,
-          lastName,
-          alias,
-          password,
-          imageBytes,
-          imageFileExtension
-        );
-
-        this.view.updateUserInfo(user, user, authToken, rememberMe);
-        this.view.navigate("/");
-      },
-      "register user",
-      () => {
-        this.view.setIsLoading(false);
-      }
-    );
+    super.authenticate(async () => {
+      const [user, authToken] = await this.service.register(
+        firstName,
+        lastName,
+        alias,
+        password,
+        imageBytes,
+        imageFileExtension
+      );
+      this.view.updateUserInfo(user, user, authToken, rememberMe);
+    }, "/");
   }
 
   public checkSubmitButtonStatus(
@@ -79,7 +74,7 @@ export class RegisterPresenter extends AuthPresenter {
   ): Promise<{ imageBytes: Uint8Array; imageFileExtension: string }> => {
     return new Promise((resolve, reject) => {
       if (file) {
-        this.registerView.setImageUrl(URL.createObjectURL(file));
+        this.view.setImageUrl(URL.createObjectURL(file));
 
         const reader = new FileReader();
         reader.onload = (event: ProgressEvent<FileReader>) => {
@@ -97,7 +92,7 @@ export class RegisterPresenter extends AuthPresenter {
         reader.onerror = (error) => reject(error);
         reader.readAsDataURL(file);
       } else {
-        this.registerView.setImageUrl("");
+        this.view.setImageUrl("");
         resolve({ imageBytes: new Uint8Array(), imageFileExtension: "" });
       }
     });

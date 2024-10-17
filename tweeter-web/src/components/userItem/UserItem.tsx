@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import useNavigateUser from "../userInfo/UserNavigationHook";
 
 interface Props {
-  value: User;
+  index: number;
+  item: User;
 }
 
 const UserItem = (props: Props) => {
@@ -15,7 +16,7 @@ const UserItem = (props: Props) => {
         <div className="row mx-0 px-0">
           <div className="col-auto p-3">
             <img
-              src={props.value.imageUrl}
+              src={props.item.imageUrl}
               className="img-fluid"
               width="80"
               alt="Posting user"
@@ -24,11 +25,11 @@ const UserItem = (props: Props) => {
           <div className="col">
             <h2>
               <b>
-                {props.value.firstName} {props.value.lastName}
+                {props.item.firstName} {props.item.lastName}
               </b>{" "}
               -{" "}
-              <Link to={props.value.alias} onClick={navigateToUser}>
-                {props.value.alias}
+              <Link to={props.item.alias} onClick={navigateToUser}>
+                {props.item.alias}
               </Link>
             </h2>
           </div>

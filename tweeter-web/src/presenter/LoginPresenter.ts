@@ -1,11 +1,8 @@
-import { UserService } from "../model/service/UserService";
-import { AuthPresenter, AuthView } from "./AuthPresenter";
+import { AuthPresenter } from "./AuthPresenter";
 
 export class LoginPresenter extends AuthPresenter {
-  private userService = new UserService();
-
-  constructor(view: AuthView) {
-    super(view);
+  protected getAuthDescription(): string {
+    return "login user";
   }
 
   public async doLogin(
@@ -17,26 +14,15 @@ export class LoginPresenter extends AuthPresenter {
     if (this.checkSubmitButtonStatus(alias, password)) {
       return;
     }
-    super.tryOperation(
-      async () => {
-        this.view.setIsLoading(true);
-        const [user, authToken] = await this.userService.login(alias, password);
-
-        this.view.updateUserInfo(user, user, authToken, rememberMe);
-
-        if (originalUrl) {
-          this.view.navigate(originalUrl);
-        } else {
-          this.view.navigate("/");
-        }
-      },
-      "log user",
-      () => {
-        this.view.setIsLoading(false);
-      }
-    );
+    super.authenticate(async () => {
+      const [user, authToken] = await this.service.login(alias, password);
+      this.view.updateUserInfo(user, user, authToken, rememberMe);
+    }, "/");
   }
 
+  private determineUrl(originalUrl: string | undefined) {
+    return originalUrl || "/";
+  }
   public checkSubmitButtonStatus = (
     alias: string,
     password: string

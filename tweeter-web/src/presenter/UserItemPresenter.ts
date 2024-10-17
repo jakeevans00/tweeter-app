@@ -1,9 +1,8 @@
 import { User } from "tweeter-shared";
-import { View } from "./Presenter";
-import { PagedItemPresenter } from "./PagedItemPresenter";
+import { PagedItemPresenter, PagedItemView } from "./PagedItemPresenter";
 import { FollowService } from "../model/service/FollowService";
 
-export interface UserItemView extends View {
+export interface UserItemView extends PagedItemView<User> {
   addItems: (newItems: User[]) => void;
 }
 
