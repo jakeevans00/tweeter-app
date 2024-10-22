@@ -11,6 +11,7 @@ import { LoginPresenter } from "../../../presenter/LoginPresenter";
 
 interface Props {
   originalUrl?: string;
+  presenter?: LoginPresenter;
 }
 
 const Login = (props: Props) => {
@@ -36,7 +37,7 @@ const Login = (props: Props) => {
     setIsLoading: setIsLoading,
   };
 
-  const [presenter] = useState(new LoginPresenter(listener));
+  const [presenter] = useState(props.presenter ?? new LoginPresenter(listener));
 
   const doLogin = async (alias: string, password: string) => {
     presenter.doLogin(alias, password, rememberMe, props?.originalUrl);

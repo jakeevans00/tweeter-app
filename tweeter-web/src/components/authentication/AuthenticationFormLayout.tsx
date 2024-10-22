@@ -53,6 +53,7 @@ const AuthenticationFormLayout = (props: Props) => {
               id="submitButton"
               className="w-100 btn btn-lg btn-primary"
               type="button"
+              aria-label="submit-button"
               disabled={props.submitButtonDisabled()}
               onClick={() => props.submit()}
             >
