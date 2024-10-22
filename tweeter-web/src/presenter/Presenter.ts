@@ -34,6 +34,7 @@ export class Presenter<T extends View> {
     } finally {
       if (typeof postOperation === "function") {
         postOperation();
+        console.log("in post");
       }
     }
   }

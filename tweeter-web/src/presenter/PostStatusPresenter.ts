@@ -7,15 +7,20 @@ export interface PostStatusView extends MessageView {
 }
 
 export class PostStatusPresenter extends Presenter<PostStatusView> {
-  private statusService = new StatusService();
+  private _statusService: StatusService;
   private _isLoading = false;
 
   constructor(view: PostStatusView) {
     super(view);
+    this._statusService = new StatusService();
   }
 
   public get isLoading() {
     return this._isLoading;
+  }
+
+  public get statusService() {
+    return this._statusService;
   }
 
   public async submitPost(
@@ -26,6 +31,7 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
     super.tryOperation(
       async () => {
         this._isLoading = true;
+        this.view.clearLastInfoMessage();
         this.view.displayInfoMessage("Posting status...", 0);
 
         const status = new Status(post, currentUser!, Date.now());
@@ -37,7 +43,6 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
       },
       "post the status",
       () => {
-        this.view.clearLastInfoMessage();
         this._isLoading = false;
       }
     );
