@@ -17,7 +17,7 @@ export class LoginPresenter extends AuthPresenter {
     super.authenticate(async () => {
       const [user, authToken] = await this.service.login(alias, password);
       this.view.updateUserInfo(user, user, authToken, rememberMe);
-    }, "/");
+    }, this.determineUrl(originalUrl));
   }
 
   private determineUrl(originalUrl: string | undefined) {

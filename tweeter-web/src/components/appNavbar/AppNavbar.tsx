@@ -62,7 +62,7 @@ const AppNavbar = () => {
             <Nav.Item>
               <NavLink
                 id="logout"
-                onClick={() => presenter.logOut(authToken!)}
+                onClick={() => presenter.logout(authToken!)}
                 to={location.pathname}
               >
                 Logout

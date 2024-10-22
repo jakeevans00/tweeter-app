@@ -7,13 +7,18 @@ export interface NavbarView extends MessageView {
 }
 
 export class NavbarPresenter extends Presenter<NavbarView> {
-  private userService = new UserService();
+  private _userService: UserService;
 
   constructor(view: NavbarView) {
     super(view);
+    this._userService = new UserService();
   }
 
-  public async logOut(authToken: AuthToken) {
+  public get userService() {
+    return this._userService;
+  }
+
+  public async logout(authToken: AuthToken) {
     super.tryOperation(async () => {
       this.view.displayInfoMessage("Logging Out...", 0);
       await this.userService.logout(authToken!);
