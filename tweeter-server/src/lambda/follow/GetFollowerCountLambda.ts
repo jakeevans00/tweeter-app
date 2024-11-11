@@ -1,11 +1,11 @@
-import { FolloweeCountResponse, TweeterRequest } from "tweeter-shared";
+import { FollowerCountResponse, TweeterRequest } from "tweeter-shared";
 import { FollowService } from "../../model/service/FollowService";
 
 export const handler = async (
   request: TweeterRequest
-): Promise<FolloweeCountResponse> => {
+): Promise<FollowerCountResponse> => {
   const followService = new FollowService();
-  const followeeCount = await followService.getFolloweeCount(
+  const followerCount = await followService.getFollowerCount(
     request.token,
     request.userAlias
   );
@@ -13,6 +13,6 @@ export const handler = async (
   return {
     success: true,
     message: null,
-    followeeCount,
+    followerCount,
   };
 };

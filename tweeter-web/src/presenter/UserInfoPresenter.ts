@@ -1,4 +1,4 @@
-import { AuthToken, User } from "tweeter-shared";
+import { AuthToken, TweeterRequest, User } from "tweeter-shared";
 import { FollowService } from "../model/service/FollowService";
 import { MessageView, Presenter } from "./Presenter";
 
@@ -34,8 +34,12 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
   public async setNumbFollowers(authToken: AuthToken, displayedUser: User) {
     super.tryOperation(async () => {
+      const request: TweeterRequest = {
+        token: authToken.token,
+        userAlias: displayedUser.alias,
+      };
       this.view.setFollowerCount(
-        await this.followService.getFollowerCount(authToken, displayedUser)
+        await this.followService.getFollowerCount(request)
       );
     }, "get followers count");
   }
@@ -60,8 +64,12 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
   public async setNumbFollowees(authToken: AuthToken, displayedUser: User) {
     super.tryOperation(async () => {
+      const request: TweeterRequest = {
+        token: authToken.token,
+        userAlias: displayedUser.alias,
+      };
       this.view.setFolloweeCount(
-        await this.followService.getFolloweeCount(authToken, displayedUser)
+        await this.followService.getFolloweeCount(request)
       );
     }, "get followees count");
   }

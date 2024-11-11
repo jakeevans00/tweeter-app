@@ -1,4 +1,4 @@
-import { User, AuthToken, FakeData } from "tweeter-shared";
+import { User, AuthToken, FakeData, TweeterRequest } from "tweeter-shared";
 import { ClientService } from "./ClientService";
 import { PagedUserItemRequest } from "tweeter-shared";
 export class FollowService extends ClientService {
@@ -14,20 +14,12 @@ export class FollowService extends ClientService {
     return this.serverFacade.getMoreFollowees(request);
   }
 
-  public async getFolloweeCount(
-    authToken: AuthToken,
-    user: User
-  ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
+  public async getFolloweeCount(request: TweeterRequest): Promise<number> {
+    return this.serverFacade.getFolloweeCount(request);
   }
 
-  public async getFollowerCount(
-    authToken: AuthToken,
-    user: User
-  ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
+  public async getFollowerCount(request: TweeterRequest): Promise<number> {
+    return this.serverFacade.getFollowerCount(request);
   }
 
   public async getIsFollowerStatus(
@@ -47,9 +39,17 @@ export class FollowService extends ClientService {
     await new Promise((f) => setTimeout(f, 2000));
 
     // TODO: Call the server
+    const followerCountRequest: TweeterRequest = {
+      token: authToken.token,
+      userAlias: userToFollow.alias,
+    };
+    const followeeCountRequest: TweeterRequest = {
+      token: authToken.token,
+      userAlias: userToFollow.alias,
+    };
 
-    const followerCount = await this.getFollowerCount(authToken, userToFollow);
-    const followeeCount = await this.getFolloweeCount(authToken, userToFollow);
+    const followerCount = await this.getFollowerCount(followerCountRequest);
+    const followeeCount = await this.getFolloweeCount(followeeCountRequest);
 
     return [followerCount, followeeCount];
   }
@@ -62,15 +62,18 @@ export class FollowService extends ClientService {
     await new Promise((f) => setTimeout(f, 2000));
 
     // TODO: Call the server
+    const followeeCountRequest: TweeterRequest = {
+      token: authToken.token,
+      userAlias: userToUnfollow.alias,
+    };
 
-    const followerCount = await this.getFollowerCount(
-      authToken,
-      userToUnfollow
-    );
-    const followeeCount = await this.getFolloweeCount(
-      authToken,
-      userToUnfollow
-    );
+    const followerCountRequest: TweeterRequest = {
+      token: authToken.token,
+      userAlias: userToUnfollow.alias,
+    };
+
+    const followerCount = await this.getFollowerCount(followerCountRequest);
+    const followeeCount = await this.getFolloweeCount(followeeCountRequest);
 
     return [followerCount, followeeCount];
   }

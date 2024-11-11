@@ -1,6 +1,9 @@
 import {
+  FolloweeCountResponse,
+  FollowerCountResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
+  TweeterRequest,
   User,
   UserDto,
 } from "tweeter-shared";
@@ -22,6 +25,34 @@ export class ServerFacade {
     request: PagedUserItemRequest
   ): Promise<[User[], boolean]> {
     return this.getMoreItems(request, "/follower/list", "followers");
+  }
+
+  public async getFolloweeCount(request: TweeterRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      FolloweeCountResponse
+    >(request, "/followee/count");
+
+    if (response.success) {
+      return response.followeeCount;
+    } else {
+      console.error(response);
+      throw new Error(response.message || "An error occurred");
+    }
+  }
+
+  public async getFollowerCount(request: TweeterRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      FollowerCountResponse
+    >(request, "/follower/count");
+
+    if (response.success) {
+      return response.followerCount;
+    } else {
+      console.error(response);
+      throw new Error(response.message || "An error occurred");
+    }
   }
 
   private async getMoreItems(

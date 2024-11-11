@@ -25,6 +25,8 @@ export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequ
  */
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse";
+export type { FolloweeCountResponse } from "./model/net/response/FolloweeCountResponse";
+export type { FollowerCountResponse } from "./model/net/response/FollowerCountResponse";
 
 /**
  * Other
