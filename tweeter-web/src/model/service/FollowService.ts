@@ -1,4 +1,9 @@
-import { User, AuthToken, FakeData, TweeterRequest } from "tweeter-shared";
+import {
+  User,
+  AuthToken,
+  TweeterRequest,
+  IsFollowerRequest,
+} from "tweeter-shared";
 import { ClientService } from "./ClientService";
 import { PagedUserItemRequest } from "tweeter-shared";
 export class FollowService extends ClientService {
@@ -23,12 +28,9 @@ export class FollowService extends ClientService {
   }
 
   public async getIsFollowerStatus(
-    authToken: AuthToken,
-    user: User,
-    selectedUser: User
+    request: IsFollowerRequest
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
+    return this.serverFacade.getIsFollowerStatus(request);
   }
 
   public async follow(
