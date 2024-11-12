@@ -13,6 +13,8 @@ export { AuthToken } from "./model/domain/AuthToken";
  */
 
 export type { UserDto } from "./model/dto/UserDto";
+export type { StatusDto } from "./model/dto/StatusDto";
+export type { PostSegmentDto } from "./model/dto/PostSegmentDto";
 
 /**
  * Requests
@@ -22,6 +24,7 @@ export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequ
 export type { IsFollowerRequest } from "./model/net/request/IsFollowerRequest";
 export type { FollowUserRequest } from "./model/net/request/FollowUserRequest";
 export type { UnfollowUserRequest } from "./model/net/request/UnfollowUserRequest";
+export type { PostStatusRequest } from "./model/net/request/PostStatusRequest";
 
 /**
  * Responses

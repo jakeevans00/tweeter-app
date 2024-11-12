@@ -7,6 +7,7 @@ import {
   IsFollowerResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
+  PostStatusRequest,
   TweeterRequest,
   TweeterResponse,
   UnfollowUserRequest,
@@ -82,6 +83,10 @@ export class ServerFacade {
         response.followeeCount,
       ]
     );
+  }
+
+  public async postStatus(request: PostStatusRequest): Promise<void> {
+    return this.makeRequest(request, "/status/post", () => {});
   }
 
   private async getMoreItems(
