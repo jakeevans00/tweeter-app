@@ -1,12 +1,15 @@
 import {
+  FollowCountsResponse,
   FolloweeCountResponse,
   FollowerCountResponse,
+  FollowUserRequest,
   IsFollowerRequest,
   IsFollowerResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
   TweeterRequest,
   TweeterResponse,
+  UnfollowUserRequest,
   User,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
@@ -52,6 +55,32 @@ export class ServerFacade {
       request,
       "/follower/isFollower",
       (response: IsFollowerResponse) => response.isFollower
+    );
+  }
+
+  public async follow(
+    request: FollowUserRequest
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    return this.makeRequest(
+      request,
+      "/followee/follow",
+      (response: FollowCountsResponse) => [
+        response.followerCount,
+        response.followeeCount,
+      ]
+    );
+  }
+
+  public async unfollow(
+    request: UnfollowUserRequest
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    return this.makeRequest(
+      request,
+      "/followee/unfollow",
+      (response: FollowCountsResponse) => [
+        response.followerCount,
+        response.followeeCount,
+      ]
     );
   }
 

@@ -1,7 +1,9 @@
 import {
   AuthToken,
+  FollowUserRequest,
   IsFollowerRequest,
   TweeterRequest,
+  UnfollowUserRequest,
   User,
 } from "tweeter-shared";
 import { FollowService } from "../model/service/FollowService";
@@ -82,15 +84,23 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     }, "get followees count");
   }
 
-  public async followDisplayedUser(displayedUser: User, authToken: AuthToken) {
+  public async followDisplayedUser(
+    displayedUser: User,
+    authToken: AuthToken,
+    currentUser: User
+  ) {
     super.tryOperation(
       async () => {
         this._isLoading = true;
         this.view.displayInfoMessage(`Following ${displayedUser!.name}...`, 0);
 
+        const followRequest: FollowUserRequest = {
+          token: authToken.token,
+          userAlias: currentUser.alias,
+          userToFollow: displayedUser.alias,
+        };
         const [followerCount, followeeCount] = await this.followService.follow(
-          authToken!,
-          displayedUser!
+          followRequest
         );
 
         this._isFollower = true;
@@ -107,7 +117,8 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
   public async unfollowDisplayedUser(
     displayedUser: User,
-    authToken: AuthToken
+    authToken: AuthToken,
+    currentUser: User
   ) {
     super.tryOperation(
       async () => {
@@ -117,8 +128,13 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
           0
         );
 
+        const unfollowRequest: UnfollowUserRequest = {
+          token: authToken.token,
+          userAlias: currentUser.alias,
+          userToUnfollow: displayedUser.alias,
+        };
         const [followerCount, followeeCount] =
-          await this.followService.unfollow(authToken!, displayedUser!);
+          await this.followService.unfollow(unfollowRequest);
 
         this._isFollower = false;
         this.view.setFollowerCount(followerCount);

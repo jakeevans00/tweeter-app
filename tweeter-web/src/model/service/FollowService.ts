@@ -1,8 +1,9 @@
 import {
   User,
-  AuthToken,
   TweeterRequest,
   IsFollowerRequest,
+  FollowUserRequest,
+  UnfollowUserRequest,
 } from "tweeter-shared";
 import { ClientService } from "./ClientService";
 import { PagedUserItemRequest } from "tweeter-shared";
@@ -34,49 +35,14 @@ export class FollowService extends ClientService {
   }
 
   public async follow(
-    authToken: AuthToken,
-    userToFollow: User
+    request: FollowUserRequest
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the follow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server
-    const followerCountRequest: TweeterRequest = {
-      token: authToken.token,
-      userAlias: userToFollow.alias,
-    };
-    const followeeCountRequest: TweeterRequest = {
-      token: authToken.token,
-      userAlias: userToFollow.alias,
-    };
-
-    const followerCount = await this.getFollowerCount(followerCountRequest);
-    const followeeCount = await this.getFolloweeCount(followeeCountRequest);
-
-    return [followerCount, followeeCount];
+    return this.serverFacade.follow(request);
   }
 
   public async unfollow(
-    authToken: AuthToken,
-    userToUnfollow: User
+    request: UnfollowUserRequest
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the unfollow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server
-    const followeeCountRequest: TweeterRequest = {
-      token: authToken.token,
-      userAlias: userToUnfollow.alias,
-    };
-
-    const followerCountRequest: TweeterRequest = {
-      token: authToken.token,
-      userAlias: userToUnfollow.alias,
-    };
-
-    const followerCount = await this.getFollowerCount(followerCountRequest);
-    const followeeCount = await this.getFolloweeCount(followeeCountRequest);
-
-    return [followerCount, followeeCount];
+    return this.serverFacade.unfollow(request);
   }
 }
