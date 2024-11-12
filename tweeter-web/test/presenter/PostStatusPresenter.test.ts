@@ -12,7 +12,7 @@ import {
   PostStatusPresenter,
   PostStatusView,
 } from "../../src/presenter/PostStatusPresenter";
-import { AuthToken, Status, User } from "tweeter-shared";
+import { AuthToken, PostStatusRequest, Status, User } from "tweeter-shared";
 import { StatusService } from "../../src/model/service/StatusService";
 
 describe("PostStatusPresenter", () => {
@@ -51,12 +51,10 @@ describe("PostStatusPresenter", () => {
 
   it("calls postStatus on post status service with correct status string and auth token", async () => {
     await postStatusPresenter.submitPost(post, currentUser, authToken);
-    const [capturedToken, capturedStatus] = capture(
-      mockStatusService.postStatus
-    ).last();
-    expect(capturedToken).toBe(authToken);
-    expect(capturedStatus).toBeInstanceOf(Status);
-    expect(capturedStatus.post).toBe(post);
+    const [capturedRequest] = capture(mockStatusService.postStatus).last();
+    expect(capturedRequest.token).toBe(authToken.token);
+    expect(Status.fromDto(capturedRequest.newStatus)).toBeInstanceOf(Status);
+    expect(capturedRequest.newStatus.post).toBe(post);
   });
 
   it("tells the view to clear last info message, clear post, and diaplay a status posted message (on success)", async () => {
@@ -70,7 +68,7 @@ describe("PostStatusPresenter", () => {
 
   it("tells the view to display an error message and clear the last info message, does not clear post or display status posted (on failure)", async () => {
     const error = new Error("An error has occured");
-    when(mockStatusService.postStatus(anything(), anything())).thenThrow(error);
+    when(mockStatusService.postStatus(anything())).thenThrow(error);
 
     await postStatusPresenter.submitPost(post, currentUser, authToken);
     verify(mockPostStatusView.clearLastInfoMessage()).once();

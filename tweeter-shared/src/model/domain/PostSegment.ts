@@ -50,12 +50,14 @@ export class PostSegment {
     };
   }
 
-  public static fromDto(dto: PostSegmentDto): PostSegment {
-    return new PostSegment(
-      dto.text,
-      dto.startPostition,
-      dto.endPosition,
-      dto.type
-    );
+  public static fromDto(dto: PostSegmentDto | null): PostSegment | null {
+    return dto == null
+      ? null
+      : new PostSegment(
+          dto.text,
+          dto.startPostition,
+          dto.endPosition,
+          dto.type
+        );
   }
 }

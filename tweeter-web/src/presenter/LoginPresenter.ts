@@ -1,3 +1,4 @@
+import { LoginRequest } from "tweeter-shared";
 import { AuthPresenter } from "./AuthPresenter";
 
 export class LoginPresenter extends AuthPresenter {
@@ -15,7 +16,12 @@ export class LoginPresenter extends AuthPresenter {
       return;
     }
     super.authenticate(async () => {
-      const [user, authToken] = await this.service.login(alias, password);
+      const loginRequest: LoginRequest = {
+        token: "",
+        userAlias: alias,
+        password: password,
+      };
+      const [user, authToken] = await this.service.login(loginRequest);
       this.view.updateUserInfo(user, user, authToken, rememberMe);
     }, this.determineUrl(originalUrl));
   }

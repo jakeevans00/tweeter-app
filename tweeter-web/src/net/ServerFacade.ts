@@ -1,13 +1,17 @@
 import {
+  AuthResponse,
+  AuthToken,
   FollowCountsResponse,
   FolloweeCountResponse,
   FollowerCountResponse,
   FollowUserRequest,
   IsFollowerRequest,
   IsFollowerResponse,
+  LoginRequest,
   PagedUserItemRequest,
   PagedUserItemResponse,
   PostStatusRequest,
+  RegisterRequest,
   TweeterRequest,
   TweeterResponse,
   UnfollowUserRequest,
@@ -87,6 +91,28 @@ export class ServerFacade {
 
   public async postStatus(request: PostStatusRequest): Promise<void> {
     return this.makeRequest(request, "/status/post", () => {});
+  }
+
+  public async login(request: LoginRequest): Promise<[User, AuthToken]> {
+    return this.makeAuthRequest(request, "/user/login");
+  }
+
+  public async register(request: RegisterRequest): Promise<[User, AuthToken]> {
+    return this.makeAuthRequest(request, "/user/register");
+  }
+
+  private async makeAuthRequest<R extends TweeterRequest>(
+    request: R,
+    endpoint: string
+  ): Promise<[User, AuthToken]> {
+    return this.makeRequest(request, endpoint, (response: AuthResponse) => {
+      const user = User.fromDto(response.user);
+      const authToken = AuthToken.fromDto(response.authToken);
+      if (!user || !authToken) {
+        throw new Error(`Unable to login`);
+      }
+      return [user, authToken];
+    });
   }
 
   private async getMoreItems(

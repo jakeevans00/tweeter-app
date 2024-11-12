@@ -1,25 +1,35 @@
-import { AuthToken, FakeData, Status } from "tweeter-shared";
+import { FakeData, Status } from "tweeter-shared";
 import { StatusDto } from "tweeter-shared/dist/model/dto/StatusDto";
 
 export class StatusService {
   public async loadMoreFeed(
-    authToken: AuthToken,
+    token: string,
     userAlias: string,
     pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> {
+    lastItem: StatusDto | null
+  ): Promise<[StatusDto[], boolean]> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    const [items, hasMoreItems] = FakeData.instance.getPageOfStatuses(
+      Status.fromDto(lastItem),
+      pageSize
+    );
+    const dtos = items.map((item) => item.dto);
+    return [dtos, hasMoreItems];
   }
 
   public async loadMoreStory(
-    authToken: AuthToken,
+    token: string,
     userAlias: string,
     pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> {
+    lastItem: StatusDto | null
+  ): Promise<[StatusDto[], boolean]> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    const [items, hasMoreItems] = FakeData.instance.getPageOfStatuses(
+      Status.fromDto(lastItem),
+      pageSize
+    );
+    const dtos = items.map((item) => item.dto);
+    return [dtos, hasMoreItems];
   }
 
   public async postStatus(token: string, newStatus: StatusDto): Promise<void> {
