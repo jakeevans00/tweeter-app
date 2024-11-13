@@ -1,5 +1,4 @@
 import { AuthToken, FakeData, UserDto, AuthTokenDto } from "tweeter-shared";
-import { Buffer } from "buffer";
 
 export class UserService {
   async login(
@@ -21,13 +20,9 @@ export class UserService {
     lastName: string,
     alias: string,
     password: string,
-    userImageBytes: Uint8Array,
+    userImageBytes: string,
     imageFileExtension: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
-
     // TODO: Replace with the result of calling the server
     const user = FakeData.instance.firstUser;
 
@@ -39,7 +34,8 @@ export class UserService {
   }
 
   async findUserByAlias(alias: string) {
-    return FakeData.instance.findUserByAlias(alias);
+    const user = FakeData.instance.findUserByAlias(alias);
+    return user == null ? null : user?.dto;
   }
 
   async logout(authToken: AuthToken): Promise<void> {

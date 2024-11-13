@@ -1,3 +1,4 @@
+import { RegisterRequest } from "tweeter-shared";
 import { AuthPresenter, AuthView } from "./AuthPresenter";
 import { Buffer } from "buffer";
 
@@ -39,14 +40,18 @@ export class RegisterPresenter extends AuthPresenter {
       return;
     }
     super.authenticate(async () => {
-      const [user, authToken] = await this.service.register(
+      const imageStringBase64: string =
+        Buffer.from(imageBytes).toString("base64");
+      const registerRequest: RegisterRequest = {
+        token: "",
+        userAlias: alias,
         firstName,
         lastName,
-        alias,
         password,
-        imageBytes,
-        imageFileExtension
-      );
+        userImageBytes: imageStringBase64,
+        imageFileExtension,
+      };
+      const [user, authToken] = await this.service.register(registerRequest);
       this.view.updateUserInfo(user, user, authToken, rememberMe);
     }, "/");
   }

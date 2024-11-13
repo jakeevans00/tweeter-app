@@ -1,4 +1,4 @@
-import { AuthToken, User } from "tweeter-shared";
+import { AuthToken, FindUserRequest, User } from "tweeter-shared";
 import { UserService } from "../model/service/UserService";
 import { Presenter, View } from "./Presenter";
 
@@ -18,7 +18,12 @@ export class NavigateUserPresenter extends Presenter<NavigateUserView> {
     alias: string
   ): Promise<User | null> {
     // TODO: Replace with the result of calling server
-    return this.userService.findUserByAlias(alias);
+    const getUserRequest: FindUserRequest = {
+      token: authToken.token,
+      userAlias: "",
+      userToFind: alias,
+    };
+    return this.userService.findUserByAlias(getUserRequest);
   }
 
   public async navigateToUser(

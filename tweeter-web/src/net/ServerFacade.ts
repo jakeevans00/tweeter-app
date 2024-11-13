@@ -1,6 +1,7 @@
 import {
   AuthResponse,
   AuthToken,
+  FindUserRequest,
   FollowCountsResponse,
   FolloweeCountResponse,
   FollowerCountResponse,
@@ -16,6 +17,7 @@ import {
   TweeterResponse,
   UnfollowUserRequest,
   User,
+  UserResponse,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -101,6 +103,12 @@ export class ServerFacade {
     return this.makeAuthRequest(request, "/user/register");
   }
 
+  public async findUserByAlias(request: FindUserRequest): Promise<User | null> {
+    return this.makeRequest(request, "/user/find", (response: UserResponse) =>
+      User.fromDto(response.user)
+    );
+  }
+
   private async makeAuthRequest<R extends TweeterRequest>(
     request: R,
     endpoint: string
@@ -109,6 +117,7 @@ export class ServerFacade {
       const user = User.fromDto(response.user);
       const authToken = AuthToken.fromDto(response.authToken);
       if (!user || !authToken) {
+        console.log("broken in auth request");
         throw new Error(`Unable to login`);
       }
       return [user, authToken];

@@ -28,6 +28,7 @@ export type { UnfollowUserRequest } from "./model/net/request/UnfollowUserReques
 export type { PostStatusRequest } from "./model/net/request/PostStatusRequest";
 export type { LoginRequest } from "./model/net/request/LoginRequest";
 export type { RegisterRequest } from "./model/net/request/RegisterRequest";
+export type { FindUserRequest } from "./model/net/request/FindUserRequest";
 
 /**
  * Responses
@@ -39,6 +40,7 @@ export type { FollowerCountResponse } from "./model/net/response/FollowerCountRe
 export type { IsFollowerResponse } from "./model/net/response/IsFollowerResponse";
 export type { FollowCountsResponse } from "./model/net/response/FollowCountsResponse";
 export type { AuthResponse } from "./model/net/response/AuthResponse";
+export type { UserResponse } from "./model/net/response/UserResponse";
 
 /**
  * Other
