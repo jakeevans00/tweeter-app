@@ -103,6 +103,10 @@ export class ServerFacade {
     return this.makeAuthRequest(request, "/user/register");
   }
 
+  public async logout(request: TweeterRequest): Promise<void> {
+    return this.makeRequest(request, "/user/logout", () => {});
+  }
+
   public async findUserByAlias(request: FindUserRequest): Promise<User | null> {
     return this.makeRequest(request, "/user/find", (response: UserResponse) =>
       User.fromDto(response.user)

@@ -1,4 +1,4 @@
-import { AuthToken } from "tweeter-shared";
+import { AuthToken, TweeterRequest } from "tweeter-shared";
 import { UserService } from "../model/service/UserService";
 import { MessageView, Presenter } from "./Presenter";
 
@@ -21,7 +21,11 @@ export class NavbarPresenter extends Presenter<NavbarView> {
   public async logout(authToken: AuthToken) {
     super.tryOperation(async () => {
       this.view.displayInfoMessage("Logging Out...", 0);
-      await this.userService.logout(authToken!);
+      const logoutRequest: TweeterRequest = {
+        token: authToken.token,
+        userAlias: "",
+      };
+      await this.userService.logout(logoutRequest);
 
       this.view.clearLastInfoMessage();
       super.view.clearUserInfo();
