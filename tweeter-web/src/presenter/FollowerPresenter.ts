@@ -1,4 +1,4 @@
-import { AuthToken, User, PagedUserItemRequest } from "tweeter-shared";
+import { AuthToken, User, PagedItemRequest, UserDto } from "tweeter-shared";
 import { UserItemPresenter } from "./UserItemPresenter";
 import { PAGE_SIZE } from "./PagedItemPresenter";
 
@@ -7,7 +7,7 @@ export class FollowerPresenter extends UserItemPresenter {
     authToken: AuthToken,
     userAlias: string
   ): Promise<[User[], boolean]> {
-    const request: PagedUserItemRequest = {
+    const request: PagedItemRequest<UserDto> = {
       token: authToken.token,
       userAlias,
       pageSize: PAGE_SIZE,

@@ -9,14 +9,17 @@ import {
   IsFollowerRequest,
   IsFollowerResponse,
   LoginRequest,
-  PagedUserItemRequest,
-  PagedUserItemResponse,
+  PagedItemRequest,
+  PagedItemResponse,
   PostStatusRequest,
   RegisterRequest,
+  Status,
+  StatusDto,
   TweeterRequest,
   TweeterResponse,
   UnfollowUserRequest,
   User,
+  UserDto,
   UserResponse,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
@@ -26,17 +29,29 @@ export class ServerFacade {
     "https://pmhfprmo6c.execute-api.us-west-2.amazonaws.com/dev";
 
   private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
+  private userFactory = new UserFactory();
+  private statusFactory = new StatusFactory();
 
   public async getMoreFollowees(
-    request: PagedUserItemRequest
+    request: PagedItemRequest<UserDto>
   ): Promise<[User[], boolean]> {
-    return this.getMoreItems(request, "/followee/list", "followees");
+    return this.getMoreItems<UserDto, User>(
+      this.userFactory,
+      request,
+      "/followee/list",
+      "followees"
+    );
   }
 
   public async getMoreFollowers(
-    request: PagedUserItemRequest
+    request: PagedItemRequest<UserDto>
   ): Promise<[User[], boolean]> {
-    return this.getMoreItems(request, "/follower/list", "followers");
+    return this.getMoreItems(
+      this.userFactory,
+      request,
+      "/follower/list",
+      "followers"
+    );
   }
 
   public async getFolloweeCount(request: TweeterRequest): Promise<number> {
@@ -68,31 +83,45 @@ export class ServerFacade {
   public async follow(
     request: FollowUserRequest
   ): Promise<[followerCount: number, followeeCount: number]> {
-    return this.makeRequest(
+    return this.doFollowOperation<FollowUserRequest>(
       request,
-      "/followee/follow",
-      (response: FollowCountsResponse) => [
-        response.followerCount,
-        response.followeeCount,
-      ]
+      "/followee/follow"
     );
   }
 
   public async unfollow(
     request: UnfollowUserRequest
   ): Promise<[followerCount: number, followeeCount: number]> {
-    return this.makeRequest(
+    return this.doFollowOperation<UnfollowUserRequest>(
       request,
-      "/followee/unfollow",
-      (response: FollowCountsResponse) => [
-        response.followerCount,
-        response.followeeCount,
-      ]
+      "/followee/unfollow"
     );
   }
 
   public async postStatus(request: PostStatusRequest): Promise<void> {
     return this.makeRequest(request, "/status/post", () => {});
+  }
+
+  public async getMoreFeed(
+    request: PagedItemRequest<StatusDto>
+  ): Promise<[Status[], boolean]> {
+    return this.getMoreItems(
+      this.statusFactory,
+      request,
+      "/status/feed",
+      "feed"
+    );
+  }
+
+  public async getMoreStory(
+    request: PagedItemRequest<StatusDto>
+  ): Promise<[Status[], boolean]> {
+    return this.getMoreItems(
+      this.statusFactory,
+      request,
+      "/status/story",
+      "story"
+    );
   }
 
   public async login(request: LoginRequest): Promise<[User, AuthToken]> {
@@ -113,6 +142,20 @@ export class ServerFacade {
     );
   }
 
+  private doFollowOperation<T extends FollowUserRequest | UnfollowUserRequest>(
+    request: T,
+    endpoint: string
+  ) {
+    return this.makeRequest(
+      request,
+      endpoint,
+      (response: FollowCountsResponse): FollowCounts => [
+        response.followerCount,
+        response.followeeCount,
+      ]
+    );
+  }
+
   private async makeAuthRequest<R extends TweeterRequest>(
     request: R,
     endpoint: string
@@ -128,18 +171,19 @@ export class ServerFacade {
     });
   }
 
-  private async getMoreItems(
-    request: PagedUserItemRequest,
+  private async getMoreItems<TDto extends Dto, TEntity extends Entity>(
+    factory: DomainFactory<TDto, TEntity>,
+    request: PagedItemRequest<TDto>,
     endpoint: string,
     itemDesc: string
-  ): Promise<[User[], boolean]> {
+  ): Promise<[TEntity[], boolean]> {
     return this.makeRequest(
       request,
       endpoint,
-      (response: PagedUserItemResponse) => {
-        const items: User[] | null =
+      (response: PagedItemResponse<TDto>) => {
+        const items: TEntity[] | null =
           response.success && response.items
-            ? response.items.map((dto) => User.fromDto(dto) as User)
+            ? response.items.map((dto) => factory.fromDto(dto) as TEntity)
             : null;
 
         if (!items) {
@@ -178,3 +222,30 @@ export class ServerFacade {
     }
   }
 }
+type Entity = Status | User;
+type Dto = StatusDto | UserDto;
+
+interface DomainFactory<TDto extends Dto, TEntity extends Entity> {
+  create(): TEntity;
+  fromDto(dto: TDto | null): TEntity | null;
+}
+
+class UserFactory implements DomainFactory<UserDto, User> {
+  create(): User {
+    return new User("first", "last", "@test", "url");
+  }
+  fromDto(dto: UserDto | null): User | null {
+    return User.fromDto(dto);
+  }
+}
+
+class StatusFactory implements DomainFactory<StatusDto, Status> {
+  create(): Status {
+    return new Status("post", new User("first", "last", "alias", "url"), 0);
+  }
+  fromDto(dto: StatusDto | null): Status | null {
+    return Status.fromDto(dto);
+  }
+}
+
+type FollowCounts = [followerCount: number, followeeCount: number];

@@ -1,25 +1,22 @@
-import { AuthToken, FakeData, PostStatusRequest, Status } from "tweeter-shared";
+import {
+  PagedItemRequest,
+  PostStatusRequest,
+  Status,
+  StatusDto,
+} from "tweeter-shared";
 import { ClientService } from "./ClientService";
 
 export class StatusService extends ClientService {
   public async loadMoreFeed(
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
+    request: PagedItemRequest<StatusDto>
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    return this.serverFacade.getMoreFeed(request);
   }
 
   public async loadMoreStory(
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
+    request: PagedItemRequest<StatusDto>
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    return this.serverFacade.getMoreStory(request);
   }
 
   public async postStatus(request: PostStatusRequest): Promise<void> {

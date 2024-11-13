@@ -4,18 +4,19 @@ import {
   IsFollowerRequest,
   FollowUserRequest,
   UnfollowUserRequest,
+  UserDto,
 } from "tweeter-shared";
 import { ClientService } from "./ClientService";
-import { PagedUserItemRequest } from "tweeter-shared";
+import { PagedItemRequest } from "tweeter-shared";
 export class FollowService extends ClientService {
   public async loadMoreFollowers(
-    request: PagedUserItemRequest
+    request: PagedItemRequest<UserDto>
   ): Promise<[User[], boolean]> {
     return this.serverFacade.getMoreFollowers(request);
   }
 
   public async loadMoreFollowees(
-    request: PagedUserItemRequest
+    request: PagedItemRequest<UserDto>
   ): Promise<[User[], boolean]> {
     return this.serverFacade.getMoreFollowees(request);
   }
