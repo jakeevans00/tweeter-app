@@ -1,14 +1,15 @@
 import { TweeterRequest, TweeterResponse } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
+import { handleFunction } from "../Utils";
 
 export const handler = async (
   request: TweeterRequest
 ): Promise<TweeterResponse> => {
-  const userService = new UserService();
-  await userService.logout(request.token);
-
-  return {
-    success: true,
-    message: null,
-  };
+  return handleFunction<TweeterResponse, UserService>(
+    UserService,
+    async (service) => {
+      await service.logout(request.token);
+      return {};
+    }
+  );
 };

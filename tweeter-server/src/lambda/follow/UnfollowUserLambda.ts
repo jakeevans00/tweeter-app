@@ -1,21 +1,18 @@
 import { FollowCountsResponse, UnfollowUserRequest } from "tweeter-shared";
 import { FollowService } from "../../model/service/FollowService";
-
-type NewType = FollowCountsResponse;
+import { handleFunction } from "../Utils";
 
 export const handler = async (
   request: UnfollowUserRequest
-): Promise<NewType> => {
-  const followService = new FollowService();
-  const [followerCount, followeeCount] = await followService.unfollow(
-    request.token,
-    request.userToUnfollow
+): Promise<FollowCountsResponse> => {
+  return handleFunction<FollowCountsResponse, FollowService>(
+    FollowService,
+    async (service) => {
+      const [followerCount, followeeCount] = await service.unfollow(
+        request.token,
+        request.userToUnfollow
+      );
+      return { followerCount, followeeCount };
+    }
   );
-
-  return {
-    success: true,
-    message: null,
-    followerCount,
-    followeeCount,
-  };
 };

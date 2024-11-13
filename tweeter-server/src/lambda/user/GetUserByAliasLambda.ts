@@ -1,14 +1,15 @@
-import { FindUserRequest, TweeterRequest, UserResponse } from "tweeter-shared";
+import { FindUserRequest, UserResponse } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
+import { handleFunction } from "../Utils";
 
 export const handler = async (
   request: FindUserRequest
 ): Promise<UserResponse> => {
-  const userService = new UserService();
-  const user = await userService.findUserByAlias(request.userToFind);
-  return {
-    success: true,
-    message: null,
-    user,
-  };
+  return handleFunction<UserResponse, UserService>(
+    UserService,
+    async (service) => {
+      const user = await service.findUserByAlias(request.userToFind);
+      return { user };
+    }
+  );
 };

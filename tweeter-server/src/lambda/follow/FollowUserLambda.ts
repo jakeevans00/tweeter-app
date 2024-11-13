@@ -5,8 +5,7 @@ import { handleFunction } from "../Utils";
 export const handler = async (
   request: FollowUserRequest
 ): Promise<FollowCountsResponse> => {
-  return handleFunction<FollowUserRequest, FollowCountsResponse, FollowService>(
-    request,
+  return handleFunction<FollowCountsResponse, FollowService>(
     FollowService,
     async (service) => {
       const [followerCount, followeeCount] = await service.follow(

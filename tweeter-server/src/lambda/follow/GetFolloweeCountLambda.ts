@@ -1,18 +1,20 @@
 import { FolloweeCountResponse, TweeterRequest } from "tweeter-shared";
 import { FollowService } from "../../model/service/FollowService";
+import { handleFunction } from "../Utils";
 
 export const handler = async (
   request: TweeterRequest
 ): Promise<FolloweeCountResponse> => {
-  const followService = new FollowService();
-  const followeeCount = await followService.getFolloweeCount(
-    request.token,
-    request.userAlias
+  return handleFunction<FolloweeCountResponse, FollowService>(
+    FollowService,
+    async (service) => {
+      const followeeCount = await service.getFolloweeCount(
+        request.token,
+        request.userAlias
+      );
+      return {
+        followeeCount,
+      };
+    }
   );
-
-  return {
-    success: true,
-    message: null,
-    followeeCount,
-  };
 };
