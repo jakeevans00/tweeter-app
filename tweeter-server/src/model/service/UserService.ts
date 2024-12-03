@@ -1,4 +1,5 @@
 import { AuthToken, FakeData, UserDto, AuthTokenDto } from "tweeter-shared";
+import { DaoFactory } from "../factory/DaoFactory";
 
 export class UserService {
   async login(

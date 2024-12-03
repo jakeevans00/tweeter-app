@@ -13,7 +13,12 @@ export const handleFunction = async <
   serviceMethod: (service: TService) => Promise<Partial<TResponse>>
 ): Promise<TResponse> => {
   const service = new ServiceClass();
-  const response = await serviceMethod(service);
+  let response;
+  try {
+    response = await serviceMethod(service);
+  } catch (error) {
+    throw new Error("[ServerError] " + (error as Error).message);
+  }
 
   return {
     success: true,

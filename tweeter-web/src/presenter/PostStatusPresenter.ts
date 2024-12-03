@@ -52,6 +52,7 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
       }
     );
   }
+  // TODO
 
   public async clearPost() {
     super.tryOperation(async () => {
