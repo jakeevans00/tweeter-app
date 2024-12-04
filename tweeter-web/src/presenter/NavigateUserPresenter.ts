@@ -17,12 +17,12 @@ export class NavigateUserPresenter extends Presenter<NavigateUserView> {
     authToken: AuthToken,
     alias: string
   ): Promise<User | null> {
-    // TODO: Replace with the result of calling server
     const getUserRequest: FindUserRequest = {
       token: authToken.token,
       userAlias: "",
       userToFind: alias,
     };
+    console.log(getUserRequest);
     return this.userService.findUserByAlias(getUserRequest);
   }
 
@@ -33,6 +33,7 @@ export class NavigateUserPresenter extends Presenter<NavigateUserView> {
   ) {
     super.tryOperation(async () => {
       const alias = this.extractAlias(eventTarget);
+      console.log(alias);
       const user = await this.getUser(authToken!, alias);
       if (user) {
         if (currentUser!.equals(user)) {

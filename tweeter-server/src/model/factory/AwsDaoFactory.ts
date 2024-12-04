@@ -30,7 +30,7 @@ export class AwsDaoFactory implements DaoFactory {
     this.followDao = new DynamoDbFollowDao();
   }
 
-  public getInstance() {
+  public static getInstance() {
     if (!AwsDaoFactory.instance) {
       AwsDaoFactory.instance = new AwsDaoFactory();
     }

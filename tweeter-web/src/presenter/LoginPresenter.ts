@@ -22,6 +22,7 @@ export class LoginPresenter extends AuthPresenter {
         password: password,
       };
       const [user, authToken] = await this.service.login(loginRequest);
+      console.log(user.alias, user.firstName);
       this.view.updateUserInfo(user, user, authToken, rememberMe);
     }, this.determineUrl(originalUrl));
   }

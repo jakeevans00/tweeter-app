@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
+import React from "react";
 
 import {
   PagedItemPresenter,
@@ -67,7 +68,10 @@ function ItemScroller<T, U>(props: Props<T, U>) {
         hasMore={presenter.hasMoreItems}
         loader={<h4>Loading...</h4>}
       >
-        {items.map((item, index) => props.itemComponentGenerator(item, index))}
+        {items.map((item, index) => {
+          const element = props.itemComponentGenerator(item, index);
+          return React.cloneElement(element, { key: index }); // Add key to existing element
+        })}
       </InfiniteScroll>
     </div>
   );

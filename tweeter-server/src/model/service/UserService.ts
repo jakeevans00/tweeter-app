@@ -1,19 +1,45 @@
-import { AuthToken, FakeData, UserDto, AuthTokenDto } from "tweeter-shared";
-import { DaoFactory } from "../factory/DaoFactory";
+import { UserDto, AuthTokenDto } from "tweeter-shared";
+import { AwsDaoFactory } from "../factory/AwsDaoFactory";
+import { UserDao } from "../dao/UserDao";
+import { SessionDao } from "../dao/SessionDao";
+import { StorageDao } from "../dao/StorageDao";
+import * as bcrypt from "bcryptjs";
+
+export interface UserDBItem {
+  firstName: string;
+  lastName: string;
+  alias: string;
+  password: string;
+  imageUrl: string;
+}
 
 export class UserService {
+  private userDao: UserDao;
+  private sessionDao: SessionDao;
+  private storageDao: StorageDao;
+
+  constructor() {
+    this.userDao = AwsDaoFactory.getInstance().getUserDao();
+    this.sessionDao = AwsDaoFactory.getInstance().getSessionDao();
+    this.storageDao = AwsDaoFactory.getInstance().getStorageDao();
+  }
+
   async login(
     alias: string,
     password: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+    const userDBItem = await this.userDao.getUser(alias);
 
-    if (user === null) {
+    if (userDBItem === null) {
+      throw new Error("User does not exist");
+    }
+    const passwordMatch = await bcrypt.compare(password, userDBItem.password);
+    if (!passwordMatch) {
       throw new Error("Invalid alias or password");
     }
+    const authDto = await this.sessionDao.createSession(userDBItem.alias);
 
-    return [user.dto, FakeData.instance.authToken.dto];
+    return [this.toUserDto(userDBItem), authDto];
   }
 
   async register(
@@ -24,20 +50,44 @@ export class UserService {
     userImageBytes: string,
     imageFileExtension: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+    const existingUser = await this.findUserByAlias(alias);
+    if (existingUser) {
+      throw new Error("User alias already exists");
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const imageUrl = await this.storageDao.uploadImage(
+      userImageBytes,
+      imageFileExtension
+    );
 
-    if (user === null) {
+    const newUserDBItem: UserDBItem = {
+      firstName,
+      lastName,
+      alias,
+      password: hashedPassword,
+      imageUrl,
+    };
+    const savedUser = await this.userDao.putUser(newUserDBItem);
+    if (savedUser === null) {
       throw new Error("Invalid registration");
     }
 
-    return [user.dto, FakeData.instance.authToken.dto];
+    const authDto = await this.sessionDao.createSession(savedUser.alias);
+    return [savedUser, authDto];
   }
 
-  async findUserByAlias(alias: string) {
-    const user = FakeData.instance.findUserByAlias(alias);
-    return user == null ? null : user?.dto;
+  async findUserByAlias(alias: string): Promise<UserDto | null> {
+    const userDBItem = await this.userDao.getUser(alias);
+    if (!userDBItem) return null;
+    return this.toUserDto(userDBItem);
   }
 
-  async logout(token: string): Promise<void> {}
+  async logout(token: string): Promise<void> {
+    await this.sessionDao.deleteSession(token);
+  }
+
+  private toUserDto(item: UserDBItem) {
+    const { password, ...userDto } = item;
+    return userDto;
+  }
 }
