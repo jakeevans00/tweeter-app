@@ -10,6 +10,7 @@ export const handler = async (
     async (service) => {
       const [followerCount, followeeCount] = await service.follow(
         request.token,
+        request.userAlias,
         request.userToFollow
       );
       return { followerCount, followeeCount };

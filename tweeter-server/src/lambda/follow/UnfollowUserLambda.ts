@@ -10,6 +10,7 @@ export const handler = async (
     async (service) => {
       const [followerCount, followeeCount] = await service.unfollow(
         request.token,
+        request.userAlias,
         request.userToUnfollow
       );
       return { followerCount, followeeCount };

@@ -11,6 +11,8 @@ export interface UserDBItem {
   alias: string;
   password: string;
   imageUrl: string;
+  followeeCount: number;
+  followerCount: number;
 }
 
 export class UserService {
@@ -54,10 +56,10 @@ export class UserService {
     if (existingUser) {
       throw new Error("User alias already exists");
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const imageUrl = await this.storageDao.uploadImage(
-      userImageBytes,
-      imageFileExtension
+    const hashedPassword = await bcrypt.hash(password, 6);
+    const imageUrl = await this.storageDao.putImage(
+      imageFileExtension,
+      userImageBytes
     );
 
     const newUserDBItem: UserDBItem = {
@@ -66,6 +68,8 @@ export class UserService {
       alias,
       password: hashedPassword,
       imageUrl,
+      followeeCount: 0,
+      followerCount: 0,
     };
     const savedUser = await this.userDao.putUser(newUserDBItem);
     if (savedUser === null) {
@@ -87,7 +91,7 @@ export class UserService {
   }
 
   private toUserDto(item: UserDBItem) {
-    const { password, ...userDto } = item;
+    const { password, followeeCount, followerCount, ...userDto } = item;
     return userDto;
   }
 }

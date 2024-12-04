@@ -1,27 +1,25 @@
-import { User, Follow } from "tweeter-shared";
+import { UserDto } from "tweeter-shared";
+import { FollowDBItem } from "../service/FollowService";
 
 export interface FollowDao {
-  putFollow(follow: Follow): Promise<void>;
-  deleteFollow(follow: Follow): Promise<void>;
+  putFollow(follow: FollowDBItem): Promise<void>;
+  deleteFollow(userAlias: string, userToUnfollow: string): Promise<void>;
 
-  getIsFollower(
+  getFollows(
     token: string,
     userAlias: string,
     selectedUserAlias: string
   ): Promise<boolean>;
 
-  getFollowerCount(token: string, userAlias: string): Promise<number>;
-  getFolloweeCount(token: string, userAlias: string): Promise<number>;
-
   getPageOfFollowees(
     followerHandle: string,
     pageSize: number,
     lastFolloweeHandle: string | undefined
-  ): Promise<[User[], boolean]>;
+  ): Promise<[UserDto[], boolean]>;
 
   getPageOfFollowers(
     followeeHandle: string,
     pageSize: number,
     lastFollowerHandle: string | undefined
-  ): Promise<[User[], boolean]>;
+  ): Promise<[UserDto[], boolean]>;
 }

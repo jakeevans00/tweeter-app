@@ -11,6 +11,7 @@ import {
 const UserInfo = () => {
   const [followeeCount, setFolloweeCount] = useState(-1);
   const [followerCount, setFollowerCount] = useState(-1);
+  const [isFollower, setIsFollowerStatus] = useState(false);
 
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
     useToastListener();
@@ -49,6 +50,7 @@ const UserInfo = () => {
   const listener: UserInfoView = {
     setFollowerCount,
     setFolloweeCount,
+    setIsFollowerStatus,
     displayErrorMessage,
     displayInfoMessage,
     clearLastInfoMessage,
@@ -97,7 +99,7 @@ const UserInfo = () => {
             <form>
               {displayedUser !== currentUser && (
                 <div className="form-group">
-                  {presenter.isFollower ? (
+                  {isFollower ? (
                     <button
                       id="unFollowButton"
                       className="btn btn-md btn-secondary me-1"

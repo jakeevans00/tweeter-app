@@ -12,6 +12,7 @@ import { MessageView, Presenter } from "./Presenter";
 export interface UserInfoView extends MessageView {
   setFollowerCount: (count: number) => void;
   setFolloweeCount: (count: number) => void;
+  setIsFollowerStatus: (status: boolean) => void;
 }
 
 export class UserInfoPresenter extends Presenter<UserInfoView> {
@@ -68,6 +69,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
         this._isFollower = await this.followService.getIsFollowerStatus(
           isFollowerRequest
         );
+        this.view.setIsFollowerStatus(this._isFollower);
       }
     }, "determine follower status");
   }

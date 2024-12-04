@@ -1,15 +1,17 @@
-import { FakeData, Status } from "tweeter-shared";
 import { StatusDto } from "tweeter-shared/dist/model/dto/StatusDto";
 import { StoryDao } from "../dao/StoryDao";
 import { FeedDao } from "../dao/FeedDao";
 import { AwsDaoFactory } from "../factory/AwsDaoFactory";
+import { FollowDao } from "../dao/FollowDao";
 
 export class StatusService {
   private storyDao: StoryDao;
   private feedDao: FeedDao;
+  private followDao: FollowDao;
   constructor() {
     this.feedDao = AwsDaoFactory.getInstance().getFeedDao();
     this.storyDao = AwsDaoFactory.getInstance().getStoryDao();
+    this.followDao = AwsDaoFactory.getInstance().getFollowDao();
   }
 
   public async loadMoreFeed(
@@ -18,8 +20,7 @@ export class StatusService {
     pageSize: number,
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return this.getFakeData(lastItem, pageSize);
+    return this.feedDao.getFeed(token, userAlias, pageSize, lastItem);
   }
 
   public async loadMoreStory(
@@ -31,19 +32,26 @@ export class StatusService {
     return this.storyDao.getStory(token, userAlias, pageSize, lastItem);
   }
 
-  private async getFakeData(
-    lastItem: StatusDto | null,
-    pageSize: number
-  ): Promise<[StatusDto[], boolean]> {
-    const [items, hasMore] = FakeData.instance.getPageOfStatuses(
-      Status.fromDto(lastItem),
-      pageSize
-    );
-    const dtos = items.map((status) => status.dto);
-    return [dtos, hasMore];
-  }
-
   public async postStatus(token: string, newStatus: StatusDto): Promise<void> {
     await this.storyDao.putStatus(newStatus);
+    let lastEvaluatedKey = undefined;
+
+    do {
+      const [followers, hasMore] = await this.followDao.getPageOfFollowers(
+        newStatus.user.alias,
+        25,
+        lastEvaluatedKey
+      );
+
+      await Promise.all(
+        followers.map((userDto) =>
+          this.feedDao.putFeed(userDto.alias, newStatus)
+        )
+      );
+
+      lastEvaluatedKey = hasMore
+        ? followers[followers.length - 1]?.alias
+        : undefined;
+    } while (lastEvaluatedKey);
   }
 }
